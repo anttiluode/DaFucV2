@@ -65,6 +65,11 @@ This will launch a Gradio interface with the following features:
 - Set an initial message to start the conversation.
 - Define the conversation duration and delay between messages.
 - Observe the interaction between the FUCWM model and LM Studio.
+- You may have to change the LM Studio model to match the one you use in the code. With old version it works without that.
+
+This line:  {"role": "system", "content": "You're talking to an experimental AI that is still learning to communicate. If it doesn't respond or sends empty messages, please be patient and continue the conversation."}, affects the dialogue a lot. Earlier I had a line "You are talking with experimental fractal model." And the dialogue was steered towards discussions about fractals without a fail.
+
+Change it if you want that not to happen 
 
 ### 4. Save/Load Model State
 - Save the current model state to a file.
