@@ -87,6 +87,14 @@ dynamic_ai = DynamicAI(vocab_size=50000, embed_dim=256, latent_dim=256, output_d
 
 Note: Increasing the depth can lead to higher complexity and potential instability. Careful tuning is required for optimal performance.
 
+# DaFucV2 AI - Demo 2 and Model Download
+
+[**Me chatting with the model**](https://www.youtube.com/watch?v=-PQ-rTkqwQ8)  
+Watch a video demonstration of me interacting with the **DaFucV2 AI** model.
+
+[**Download the model on Hugging Face**](https://huggingface.co/Aluode/Model/tree/main)  
+You can download the model I chatted with directly from Hugging Face.
+
 ## Training Data Format
 
 Q&A pairs for training should be in a JSON file with the following format:
