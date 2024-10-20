@@ -1,5 +1,7 @@
 # Dynamic AI: Fractal Universe Chocolate Wafer Model (FUCWM) (V2) (I removed the superweights) 
 
+EDIT: Added think mode. The AI has now a feedback loop for its thoughts in one tab. 
+
 ## Video of LM - Studio teaching it to talk
 
 [Video](https://www.youtube.com/live/LK7I3kOZ9AM)
