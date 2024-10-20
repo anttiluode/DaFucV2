@@ -164,7 +164,7 @@ class FUCWM(nn.Module):
         
         update_node(self.root, 0)
 
-# DynamicAI class (mostly unchanged, removed superweight-related methods)
+# DynamicAI class (with new think_mode method)
 class DynamicAI:
     def __init__(self, vocab_size=10000, embed_dim=64, latent_dim=64, output_dim=64, max_depth=5):
         self.vae = VAE(embed_dim, latent_dim)
@@ -338,7 +338,6 @@ class DynamicAI:
             logger.error(f"Error sending to LM Studio: {str(e)}")
             return None
 
-
     def train_on_qa_pairs(self, qa_pairs, epochs=10):
         if not isinstance(qa_pairs, list) or len(qa_pairs) == 0:
             raise ValueError("qa_pairs must be a non-empty list")
@@ -401,6 +400,20 @@ class DynamicAI:
     def manage_padding(self):
         self.model.manage_padding()
 
+    def think_mode(self, initial_thought, max_iterations=10, temperature=0.7):
+        thought = initial_thought
+        thought_log = [f"Initial thought: {initial_thought}"]
+        
+        for i in range(max_iterations):
+            response = self.chat(thought, temperature=temperature)
+            thought = response.split("Response: ")[-1].strip()
+            thought_log.append(f"Thought {i+1}: {thought}")
+            yield "\n".join(thought_log)
+            
+            if not thought:
+                thought_log.append("(Empty thought generated. Ending think mode.)")
+                break
+
 # Gradio Interface for DynamicAI
 def create_gradio_interface(ai):
     def handle_chat(message, temperature):
@@ -433,6 +446,12 @@ def create_gradio_interface(ai):
             conversation_log = log
             yield conversation_log
 
+    def handle_think_mode(initial_thought, max_iterations, temperature):
+        thought_log = gr.Textbox()
+        for log in ai.think_mode(initial_thought, max_iterations=int(max_iterations), temperature=float(temperature)):
+            thought_log = log
+            yield thought_log
+
     with gr.Blocks() as interface:
         gr.Markdown("# Dynamic AI with Fractal Universe Chocolate Wafer Model and Attention Mechanism")
 
@@ -450,6 +469,22 @@ def create_gradio_interface(ai):
             conversation_log = gr.Textbox(label="Conversation Log", lines=20)
             start_conversation = gr.Button("Start Conversation")
             start_conversation.click(handle_lm_studio_chat, inputs=[initial_message, duration, delay], outputs=conversation_log)
+
+        with gr.Tab("Think Mode"):
+            initial_thought = gr.Textbox(label="Initial Thought")
+            max_iterations = gr.Number(label="Max Iterations", value=10)
+            think_temperature = gr.Slider(minimum=0.1, maximum=2.0, value=0.7, label="Temperature")
+            thought_log = gr.Textbox(label="Thought Log", lines=20)
+            start_thinking = gr.Button("Start Thinking")
+            stop_thinking = gr.Button("Stop Thinking")
+            
+            # Modified event handling for Think Mode
+            think_event = start_thinking.click(
+                handle_think_mode, 
+                inputs=[initial_thought, max_iterations, think_temperature], 
+                outputs=thought_log
+            )
+            stop_thinking.click(lambda: None, cancels=[think_event])
 
         with gr.Tab("Train on Q&A"):
             qa_file = gr.File(label="Q&A Pairs JSON File")
